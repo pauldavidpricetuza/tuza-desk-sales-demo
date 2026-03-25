@@ -1,0 +1,15 @@
+export const spacing = {
+  "spacing-0": "0",
+  "spacing-0.5": "0.125rem",
+  "spacing-1": "0.25rem",
+  "spacing-1.5": "0.375rem",
+  "spacing-2": "0.5rem",
+  "spacing-3": "0.75rem",
+  "spacing-4": "1rem",
+  "spacing-5": "1.25rem",
+  "spacing-6": "1.5rem",
+  "spacing-8": "2rem",
+  "spacing-10": "2.5rem",
+  "spacing-12": "3rem",
+  "spacing-16": "4rem",
+} as const;
