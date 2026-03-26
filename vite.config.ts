@@ -5,6 +5,11 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react(), vanillaExtractPlugin()],
+  // Must match netlify.toml [dev] targetPort (5173). If Vite picked another port, Netlify's proxy would show a blank page.
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
   resolve: {
     alias: {
       '#theme': path.resolve(__dirname, 'src/theme'),

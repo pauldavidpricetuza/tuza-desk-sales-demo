@@ -28,22 +28,6 @@ export const status = style([
   { color: themeVars.semanticColour.text.brandSecondary, margin: 0 },
 ])
 
-export const transcriptBox = style([
-  text({ font: 'body1' }),
-  {
-    width: '100%',
-    minHeight: 72,
-    maxHeight: 140,
-    overflowY: 'auto',
-    padding: themeVars.spacing['spacing-2'],
-    borderRadius: themeVars.border.radius.s,
-    background: themeVars.backgroundColour.background0,
-    border: `${themeVars.border.width.default} solid ${themeVars.border.colour.colour1}`,
-    color: themeVars.semanticColour.text.brandDefault,
-    whiteSpace: 'pre-wrap',
-  },
-])
-
 export const hint = style([
   text({ font: 'body2' }),
   { color: themeVars.semanticColour.text.brandTertiary, margin: 0 },

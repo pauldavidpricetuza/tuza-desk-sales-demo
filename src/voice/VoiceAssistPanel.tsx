@@ -25,22 +25,16 @@ export function VoiceAssistPanel({ currentSection, onPatch }: VoiceAssistPanelPr
 
   const [applyError, setApplyError] = useState<string | null>(null)
   const [applying, setApplying] = useState(false)
-  const [transcriptLog, setTranscriptLog] = useState<string[]>([])
   const onPatchRef = useRef(onPatch)
   onPatchRef.current = onPatch
-
-  const clearTranscriptLog = useCallback(() => {
-    setTranscriptLog([])
-  }, [])
 
   const prevApiSectionRef = useRef<VoiceSection | null>(null)
   useEffect(() => {
     if (prevApiSectionRef.current !== null && prevApiSectionRef.current !== apiSection) {
-      clearTranscriptLog()
       setApplyError(null)
     }
     prevApiSectionRef.current = apiSection
-  }, [apiSection, clearTranscriptLog])
+  }, [apiSection])
 
   const sendRecording = useCallback(
     async (blob: Blob) => {
@@ -73,9 +67,6 @@ export function VoiceAssistPanel({ currentSection, onPatch }: VoiceAssistPanelPr
           return
         }
         const tr = typeof data.transcript === 'string' ? data.transcript.trim() : ''
-        if (tr) {
-          setTranscriptLog(prev => [...prev, tr])
-        }
         const patch = data.patch ?? {}
         if (Object.keys(patch).length > 0) {
           onPatchRef.current(apiSection, patch)
@@ -122,8 +113,6 @@ export function VoiceAssistPanel({ currentSection, onPatch }: VoiceAssistPanelPr
     )
   }
 
-  const displayTranscript = transcriptLog.join('\n\n')
-
   return (
     <div className={s.wrap}>
       <p className={s.hint}>
@@ -140,20 +129,9 @@ export function VoiceAssistPanel({ currentSection, onPatch }: VoiceAssistPanelPr
         >
           {isRecording ? 'Stop & apply' : 'Start recording'}
         </Button>
-        <Button type="button" variant="secondary" onClick={clearTranscriptLog} isDisabled={!displayTranscript}>
-          Clear transcript
-        </Button>
+        {isRecording && <span className={s.hint}>Recording… speak now.</span>}
         {applying && <span className={s.status}>Processing audio…</span>}
       </div>
-      {(displayTranscript || isRecording) && (
-        <div className={s.transcriptBox} aria-live="polite">
-          {isRecording && !displayTranscript ? (
-            <span className={s.hint}>Recording… speak now.</span>
-          ) : (
-            displayTranscript || <span className={s.hint}>Transcript from your clips appears here.</span>
-          )}
-        </div>
-      )}
       {micError && <p className={s.errorText}>{micError}</p>}
       {applyError && <p className={s.errorText}>{applyError}</p>}
     </div>

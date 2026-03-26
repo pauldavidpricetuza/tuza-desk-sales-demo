@@ -10,7 +10,7 @@
 [functions]
   directory = "netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# No catch-all `/* -> /index.html` redirect here: on `netlify dev` that rewrite applies to
+# `/src/*`, `/@vite/*`, etc., so the browser loads HTML instead of JS and you get a blank page.
+# This demo has no URL-based routes; production still serves `/` and `/assets/*` from the Vite build.
+# If you add client-side routes later, add a SPA rule via Netlify UI or a scoped redirect pattern.
