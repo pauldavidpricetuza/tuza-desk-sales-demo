@@ -232,6 +232,17 @@ export const statusDot = style({
   flexShrink: 0,
 });
 
+/** Figma “Skipped” — hollow dot */
+export const statusDotSkipped = style({
+  width: 6,
+  height: 6,
+  borderRadius: themeVars.border.radius.full,
+  flexShrink: 0,
+  boxSizing: "border-box",
+  background: "transparent",
+  border: `1px solid ${themeVars.border.colour.colour2}`,
+});
+
 export const statusLabel = style([
   text({ font: "body2" }),
   {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { PlusIcon, TrashSimpleIcon, PencilSimpleIcon, CaretDoubleDownIcon } from '@phosphor-icons/react'
 import { Button } from '#ui/Button/Button'
 import { TextInput } from '#ui/TextInput/TextInput'
@@ -18,6 +18,7 @@ import {
 } from './AppFormBusinessPanel.css'
 import { AddBusinessOwnerModal, type BusinessOwner } from './AddBusinessOwnerModal'
 import { DocumentUpload, type DocumentUploadFile, type FileRejection } from './DocumentUpload'
+import type { ApplicationVoicePatch } from '../voice/fieldSchemas'
 
 const GOODS_DESC_MAX = 500
 
@@ -155,12 +156,14 @@ interface V1ApplicationSectionProps {
   email?: string
   mcc?: string
   isMobile?: boolean
+  voicePatch?: ApplicationVoicePatch
+  voicePatchNonce?: number
   onContinue: () => void
 }
 
 export function V1ApplicationSection({
   merchantName, businessType: initialBizType, phone: initialPhone, email: initialEmail, mcc: initialMcc,
-  isMobile = false, onContinue,
+  isMobile = false, voicePatch, voicePatchNonce = 0, onContinue,
 }: V1ApplicationSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const nextFileId = useRef(0)
@@ -232,6 +235,70 @@ export function V1ApplicationSection({
   const selectedSigner = owners.find(o => o.id === signer)
   const signerDisplayName = selectedSigner ? `${selectedSigner.firstName} ${selectedSigner.lastName}` : ''
   const hasOwners = owners.length > 0
+
+  useEffect(() => {
+    if (!voicePatch || !voicePatchNonce) return
+    const p = voicePatch
+    const s = (v: string | undefined, set: (x: string) => void) => {
+      if (v !== undefined && v !== '') set(v)
+    }
+    const yn = (v: 'yes' | 'no' | undefined, set: (x: '' | 'yes' | 'no') => void) => {
+      if (v === 'yes' || v === 'no') set(v)
+    }
+    s(p.bizType, setBizType)
+    s(p.regDate, setRegDate)
+    s(p.companyName, setCompanyName)
+    yn(p.tradingDiff, setTradingDiff)
+    s(p.tradingName, setTradingName)
+    s(p.regAddress, setRegAddress)
+    if (p.tradingAddressMode === 'same' || p.tradingAddressMode === 'other') setTradingAddressMode(p.tradingAddressMode)
+    s(p.tradingAddress, setTradingAddress)
+    s(p.vatNumber, setVatNumber)
+    s(p.bizPhone, setBizPhone)
+    s(p.csPhone, setCsPhone)
+    s(p.website, setWebsite)
+    s(p.mcc, setMcc)
+    s(p.goodsDesc, setGoodsDesc)
+    s(p.bizTurnover, setBizTurnover)
+    s(p.cardTurnover, setCardTurnover)
+    s(p.avgTx, setAvgTx)
+    s(p.debitPct, setDebitPct)
+    s(p.creditPct, setCreditPct)
+    s(p.onlinePhonePct, setOnlinePhonePct)
+    yn(p.inPerson, v => setInPerson(v))
+    yn(p.online, v => setOnline(v))
+    yn(p.phonePayments, v => setPhonePayments(v))
+    yn(p.deposits, v => setDeposits(v))
+    s(p.depositPct, setDepositPct)
+    s(p.depositSize, setDepositSize)
+    s(p.depositAdvance, setDepositAdvance)
+    s(p.depositPayment, setDepositPayment)
+    yn(p.prepayments, v => setPrepayments(v))
+    s(p.prepayPct, setPrepayPct)
+    s(p.prepayDays, setPrepayDays)
+    yn(p.warranties, v => setWarranties(v))
+    s(p.warrantyCt, setWarrantyCt)
+    s(p.warrantyLen, setWarrantyLen)
+    s(p.warrantyReturn, setWarrantyReturn)
+    s(p.warrantyProvider, setWarrantyProvider)
+    yn(p.memberships, v => setMemberships(v))
+    s(p.membershipPct, setMembershipPct)
+    s(p.membershipLen, setMembershipLen)
+    s(p.membershipCost, setMembershipCost)
+    yn(p.stockSame, v => setStockSame(v))
+    s(p.stockAddress, setStockAddress)
+    s(p.acctHolder, setAcctHolder)
+    s(p.sortCode, setSortCode)
+    s(p.acctNumber, setAcctNumber)
+    s(p.bankName, setBankName)
+    yn(p.sameCharges, v => setSameCharges(v))
+    s(p.chHolder, setChHolder)
+    s(p.chSort, setChSort)
+    s(p.chAcct, setChAcct)
+    s(p.chBank, setChBank)
+    yn(p.paperlessDD, v => setPaperlessDD(v))
+    s(p.ddEmail, setDdEmail)
+  }, [voicePatchNonce, voicePatch])
 
   const handleFilesAdded = useCallback((incoming: File[]) => {
     const newFiles: DocumentUploadFile[] = incoming.map(f => ({

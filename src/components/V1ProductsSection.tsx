@@ -37,6 +37,7 @@ import {
 } from './ProductSelectionPanel.css'
 import * as s from './V1ProductsSection.css'
 import { themeVars } from '../theme/theme.css'
+import type { ProductsVoicePatch } from '../voice/fieldSchemas'
 
 // ── Streamed agent (asterisk → typewriter → action) ───────────────────────────
 
@@ -330,7 +331,7 @@ function ProductOffersSubsection({
   onToggle: (id: string) => void
 }) {
   return (
-    <div className={clsx(s.subSection, s.subSectionEnd)}>
+    <div className={s.subSection}>
       <div className={s.subSectionTitleRow}>
         <CaretDoubleDownIcon size={12} color="#E07B39" weight="bold" />
         <span className={s.subSectionTitleText}>Select product offers</span>
@@ -528,10 +529,18 @@ export interface ReceiptSnapshot {
 interface V1ProductsSectionProps {
   isLocked?: boolean
   isMobile?: boolean
+  voicePatch?: ProductsVoicePatch
+  voicePatchNonce?: number
   onContinue: (snapshot: ReceiptSnapshot) => void
 }
 
-export function V1ProductsSection({ isLocked = false, isMobile = false, onContinue }: V1ProductsSectionProps) {
+export function V1ProductsSection({
+  isLocked = false,
+  isMobile = false,
+  voicePatch,
+  voicePatchNonce = 0,
+  onContinue,
+}: V1ProductsSectionProps) {
 
   // ── Configured products (the "basket") ──
   const [configuredProducts, setConfiguredProducts] = useState<ConfiguredProduct[]>([])
@@ -572,6 +581,20 @@ export function V1ProductsSection({ isLocked = false, isMobile = false, onContin
   const hasLowMargin = HEADLINE_RATES.filter(r => !r.isFlat).some(
     r => calcRowFlag(r, customRates[r.id] ?? r.defaultRate) !== 'green'
   )
+
+  useEffect(() => {
+    if (!voicePatch || !voicePatchNonce) return
+    const p = voicePatch
+    if (p.pricingPlan !== undefined) setPricingPlan(p.pricingPlan)
+    if (p.selectedProductId) {
+      const exists = flatProducts.some(fp => fp.id === p.selectedProductId)
+      if (exists) setSelectedProductId(p.selectedProductId)
+    }
+    if (p.selectedOfferIds?.length) {
+      const allowed = new Set(OFFERS.map(o => o.id))
+      setSelectedOffers(p.selectedOfferIds.filter(id => allowed.has(id)))
+    }
+  }, [voicePatchNonce, voicePatch])
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
@@ -1034,7 +1057,7 @@ export function V1ProductsSection({ isLocked = false, isMobile = false, onContin
                       </div>
                     )}
                     {def.upgrades.length > 0 && (
-                      <div className={clsx(s.subSection, s.subSectionEnd)}>
+                      <div className={s.subSection}>
                         <div className={s.innerColumn}>
                           <div className={s.subSectionTitleRow}>
                             <CaretDoubleDownIcon size={12} color="#E07B39" weight="bold" />
@@ -1197,7 +1220,7 @@ export function V1ProductsSection({ isLocked = false, isMobile = false, onContin
                               )}
 
                               {sel && prod.upgrades.length > 0 && (
-                                <div className={clsx(s.subSection, s.subSectionEnd)}>
+                                <div className={s.subSection}>
                                   <div className={s.innerColumn}>
                                     <div className={s.subSectionTitleRow}>
                                       <CaretDoubleDownIcon size={12} color="#E07B39" weight="bold" />

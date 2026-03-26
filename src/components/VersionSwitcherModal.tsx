@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { CheckCircleIcon, XIcon } from '@phosphor-icons/react'
 
-export type DemoVersion = 'v0' | 'v1'
+export type DemoVersion = 'v0' | 'v1' | 'v2'
 
 interface VersionOption {
   id: DemoVersion
@@ -23,6 +23,12 @@ const VERSION_OPTIONS: VersionOption[] = [
     label: 'Desk Sales Demo',
     description: 'Revised application flow with updated navigation structure.',
     badge: 'V1',
+  },
+  {
+    id: 'v2',
+    label: 'Desk Sales Demo',
+    description: 'Same as V1 with voice: live transcription and AI-assisted field fill.',
+    badge: 'V2',
   },
 ]
 

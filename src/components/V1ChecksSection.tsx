@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { AsteriskIcon, CaretDoubleDownIcon, Spinner } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import { Button } from '#ui/Button/Button'
@@ -6,7 +6,7 @@ import { ResolutionPanel } from './ResolutionPanel'
 import * as s from './V1ChecksSection.css'
 import { themeVars } from '#theme/theme.css'
 
-type CheckStatus = 'failed' | 'failed-to-run' | 'passed'
+type CheckStatus = 'failed' | 'failed-to-run' | 'passed' | 'skipped'
 
 interface SubCheck {
   id: string
@@ -30,37 +30,35 @@ interface GroupCheck {
 
 type CheckItem = SimpleCheck | GroupCheck
 
+/** Matches Figma Enterprise 2.0 — Checks (node 8426:136597). */
 const CHECK_ITEMS: CheckItem[] = [
-  { type: 'simple', id: 'trading-name',    label: 'Trading name',           result: 'failed' },
-  { type: 'simple', id: 'trading-address', label: 'Trading address',        result: 'failed' },
-  { type: 'simple', id: 'reg-address',     label: 'Registered address',     result: 'passed' },
-  { type: 'simple', id: 'entity-type',     label: 'Entity type',            result: 'passed' },
-  { type: 'simple', id: 'mcc',             label: 'Merchant category code', result: 'passed' },
-  { type: 'simple', id: 'proof-banking',   label: 'Proof of banking',       result: 'passed' },
-  { type: 'simple', id: 'shareholder',     label: 'Shareholder',            result: 'failed-to-run' },
+  { type: 'simple', id: 'trading-name', label: 'Trading name', result: 'failed' },
+  { type: 'simple', id: 'trading-address', label: 'Trading address', result: 'failed' },
+  { type: 'simple', id: 'reg-address', label: 'Registered address', result: 'passed' },
+  { type: 'simple', id: 'entity-type', label: 'Entity type', result: 'skipped' },
+  { type: 'simple', id: 'mcc', label: 'Merchant category code', result: 'passed' },
+  { type: 'simple', id: 'proof-banking', label: 'Proof of banking', result: 'passed' },
   {
-    type: 'group', id: 'principal-paul', label: 'Principal – Paul Price',
+    type: 'group',
+    id: 'shareholder-paul',
+    label: 'Shareholder: Paul Price',
     subChecks: [
-      { id: 'paul-name',        label: 'Name',          result: 'failed' },
-      { id: 'paul-role',        label: 'Role',          result: 'failed' },
-      { id: 'paul-nationality', label: 'Nationality',   result: 'failed' },
-      { id: 'paul-dob',         label: 'Date of birth', result: 'failed' },
-      { id: 'paul-officer',     label: 'Officer',       result: 'failed' },
+      { id: 'paul-name', label: 'Name', result: 'failed' },
+      { id: 'paul-role', label: 'Role', result: 'failed' },
     ],
   },
   {
-    type: 'group', id: 'principal-rose', label: 'Principal – Rose Ford',
+    type: 'group',
+    id: 'shareholder-rose',
+    label: 'Shareholder: Rose Ford',
     subChecks: [
-      { id: 'rose-name',        label: 'Name',          result: 'passed' },
-      { id: 'rose-role',        label: 'Role',          result: 'passed' },
-      { id: 'rose-nationality', label: 'Nationality',   result: 'passed' },
-      { id: 'rose-dob',         label: 'Date of birth', result: 'passed' },
-      { id: 'rose-officer',     label: 'Officer',       result: 'passed' },
+      { id: 'rose-dob', label: 'Date of birth', result: 'failed' },
+      { id: 'rose-nationality', label: 'Nationality', result: 'failed' },
     ],
   },
 ]
 
-const STATUS_DOT_COLOR: Record<CheckStatus, string> = {
+const STATUS_DOT_COLOR: Record<Exclude<CheckStatus, 'skipped'>, string> = {
   'failed': themeVars.colourPalette.statusRed,
   'failed-to-run': themeVars.colourPalette.statusOrange,
   'passed': themeVars.colourPalette.statusGreen,
@@ -70,6 +68,7 @@ const STATUS_LABEL: Record<CheckStatus, string> = {
   'failed': 'Issue found',
   'failed-to-run': 'Failed to run',
   'passed': 'Passed',
+  'skipped': 'Skipped',
 }
 
 interface V1ChecksSectionProps {
@@ -319,7 +318,11 @@ function CheckStatusDisplay({ result, isResolved, onStartResolution }: {
   return (
     <>
       <div className={s.statusRow}>
-        <div className={s.statusDot} style={{ background: STATUS_DOT_COLOR[result] }} />
+        {result === 'skipped' ? (
+          <div className={s.statusDotSkipped} />
+        ) : (
+          <div className={s.statusDot} style={{ background: STATUS_DOT_COLOR[result] }} />
+        )}
         <span className={s.statusLabel}>{STATUS_LABEL[result]}</span>
       </div>
 

@@ -531,13 +531,13 @@ export const subSection = style([
   },
 ])
 
-export const subSectionEnd = style({
-  alignItems: 'flex-end',
-})
-
 export const subSectionTitleRow = style([
   sprinkles({ display: 'flex', alignItems: 'center' }),
-  { gap: 4 },
+  {
+    gap: 4,
+    width: '100%',
+    justifyContent: 'flex-start',
+  },
 ])
 
 export const subSectionTitleText = style([

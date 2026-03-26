@@ -4,6 +4,8 @@ import { ApplicationsList } from './pages/ApplicationsList'
 import { ApplicationPage } from './pages/ApplicationPage'
 import { V1ApplicationsList } from './pages/V1ApplicationsList'
 import { V1ApplicationPage } from './pages/V1ApplicationPage'
+import { V2ApplicationsList } from './pages/V2ApplicationsList'
+import { V2ApplicationPage } from './pages/V2ApplicationPage'
 import { LogoPickerButton, type LogoOption } from './components/LogoPickerButton'
 import { VersionSwitcherModal, type DemoVersion } from './components/VersionSwitcherModal'
 
@@ -102,7 +104,7 @@ export default function App() {
 
   const onSettingsClick = () => setShowVersionModal(true)
 
-  if (version === 'v1') {
+  if (version === 'v1' || version === 'v2') {
     return (
       <>
         {showVersionModal && (
@@ -113,6 +115,24 @@ export default function App() {
           />
         )}
         {view.page === 'application' ? (
+          version === 'v2' ? (
+          <V2ApplicationPage
+            merchantName={view.data.merchantName}
+            contactName={view.data.contactName}
+            phone={view.data.phone}
+            email={view.data.email}
+            businessType={view.data.businessType}
+            businessDescription={view.data.businessDescription}
+            mcc={view.data.mcc}
+            logoPicker={logoPicker}
+            logoLabel={selectedLogo.label}
+            onSubmit={(merchantName) => {
+              setView({ page: 'list' })
+              setToast({ merchantName })
+            }}
+            onSettingsClick={onSettingsClick}
+          />
+          ) : (
           <V1ApplicationPage
             merchantName={view.data.merchantName}
             contactName={view.data.contactName}
@@ -130,7 +150,17 @@ export default function App() {
             }}
             onSettingsClick={onSettingsClick}
           />
+          )
         ) : (
+          version === 'v2' ? (
+          <V2ApplicationsList
+            logoPicker={logoPicker}
+            logoLabel={selectedLogo.label}
+            onStartApplication={(data) => setView({ page: 'application', data })}
+            onOpenApplication={(data) => setView({ page: 'application', data })}
+            onSettingsClick={onSettingsClick}
+          />
+          ) : (
           <V1ApplicationsList
             logoPicker={logoPicker}
             logoLabel={selectedLogo.label}
@@ -138,6 +168,7 @@ export default function App() {
             onOpenApplication={(data) => setView({ page: 'application', data })}
             onSettingsClick={onSettingsClick}
           />
+          )
         )}
       </>
     )

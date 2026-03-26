@@ -720,6 +720,8 @@ export const offerList = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 8,
+  width: '100%',
+  alignSelf: 'stretch',
 })
 
 export const offerCard = style({

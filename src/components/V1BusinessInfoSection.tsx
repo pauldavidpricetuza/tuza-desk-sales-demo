@@ -193,12 +193,26 @@ interface V1BusinessInfoSectionProps {
   phone?: string
   email?: string
   isMobile?: boolean
+  /** V2 voice fill: merge when nonce increments */
+  voicePatch?: Partial<BusinessInfoData>
+  voicePatchNonce?: number
   onContinue: (data: BusinessInfoData) => void
 }
 
 const MAX_DESC = 500
 
-export function V1BusinessInfoSection({ initialData = {}, isLocked = false, showProductWarning = false, contactName, phone, email, isMobile = false, onContinue }: V1BusinessInfoSectionProps) {
+export function V1BusinessInfoSection({
+  initialData = {},
+  isLocked = false,
+  showProductWarning = false,
+  contactName,
+  phone,
+  email,
+  isMobile = false,
+  voicePatch,
+  voicePatchNonce = 0,
+  onContinue,
+}: V1BusinessInfoSectionProps) {
   const [businessType, setBusinessType] = useState(initialData.businessType ?? '')
   const [businessName, setBusinessName] = useState(initialData.businessName ?? '')
   const [businessDescription, setBusinessDescription] = useState(initialData.businessDescription ?? '')
@@ -210,6 +224,19 @@ export function V1BusinessInfoSection({ initialData = {}, isLocked = false, show
   const [paymentLocation, setPaymentLocation] = useState(initialData.paymentLocation ?? '')
 
   const isLimitedCompany = businessType === 'private-limited-company' || businessType === 'public-limited-company'
+
+  useEffect(() => {
+    if (!voicePatch || !voicePatchNonce) return
+    const p = voicePatch
+    if (p.businessType) setBusinessType(p.businessType)
+    if (p.businessName) setBusinessName(p.businessName)
+    if (p.businessDescription) setBusinessDescription(p.businessDescription)
+    if (p.mcc) setMcc(p.mcc)
+    if (p.provider) setProvider(p.provider)
+    if (p.cardTurnover) setCardTurnover(p.cardTurnover)
+    if (p.avgTransaction) setAvgTransaction(p.avgTransaction)
+    if (p.paymentLocation !== undefined) setPaymentLocation(p.paymentLocation)
+  }, [voicePatchNonce, voicePatch])
 
   const isFirstRender = useRef(true)
   useEffect(() => {

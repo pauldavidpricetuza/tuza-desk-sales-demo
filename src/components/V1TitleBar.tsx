@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { NoteIcon, CaretRightIcon, LockSimpleIcon } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import { Button } from '#ui/Button/Button'
@@ -24,6 +25,8 @@ interface V1TitleBarProps {
   notesOpen: boolean
   onNotesToggle: () => void
   isMobile?: boolean
+  /** Optional slot below the title bar (e.g. V2 voice assist). */
+  voiceSlot?: ReactNode
 }
 
 function getStepClass(
@@ -68,9 +71,11 @@ export function V1TitleBar({
   notesOpen,
   onNotesToggle,
   isMobile = false,
+  voiceSlot,
 }: V1TitleBarProps) {
   if (isMobile) {
     return (
+      <>
       <div className={s.mobileBar}>
         <div className={s.mobileScrollRow}>
           {STEPS.map((step, i) => {
@@ -90,10 +95,13 @@ export function V1TitleBar({
           })}
         </div>
       </div>
+      {voiceSlot}
+      </>
     )
   }
 
   return (
+    <>
     <div className={s.desktopBar}>
       {/* Left: title */}
       <div className={s.titleColumn}>
@@ -131,5 +139,7 @@ export function V1TitleBar({
         </Button>
       </div>
     </div>
+    {voiceSlot}
+    </>
   )
 }
